@@ -1,0 +1,34 @@
+plugins {
+    id 'fabric-loom' version '1.14-SNAPSHOT'
+}
+
+version = "${project.mod_version}+mc${project.minecraft_version}"
+group = project.maven_group
+base { archivesName = project.archives_base_name }
+
+repositories { }
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    // No other libraries: no Fabric API, no ukulib.
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mcdep", project.minecraft_dep
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version, "mcdep": project.minecraft_dep
+    }
+}
+
+tasks.withType(JavaCompile).configureEach { it.options.release = 21 }
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+jar {
+    from("LICENSE") { rename { "${it}_${project.archives_base_name}" } }
+}
